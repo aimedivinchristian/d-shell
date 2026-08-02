@@ -72,6 +72,9 @@ export default function Home() {
               isAvailable={sync.isAvailable}
               onSignInMagicLink={sync.signInWithMagicLink}
               onSignInGitHub={sync.signInWithGitHub}
+              onSignInGoogle={sync.signInWithGoogle}
+              onSignUpWithPassword={sync.signUpWithPassword}
+              onSignInWithPassword={sync.signInWithPassword}
               onSignOut={() => {
                 sync.signOut();
                 setShowAuthPanel(false);
