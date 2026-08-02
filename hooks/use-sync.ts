@@ -21,6 +21,9 @@ interface UseSyncResult {
   restoredFilesystem: DirNode | null;
   signInWithMagicLink: ReturnType<typeof useAuth>["signInWithMagicLink"];
   signInWithGitHub: ReturnType<typeof useAuth>["signInWithGitHub"];
+  signInWithGoogle: ReturnType<typeof useAuth>["signInWithGoogle"];
+  signUpWithPassword: ReturnType<typeof useAuth>["signUpWithPassword"];
+  signInWithPassword: ReturnType<typeof useAuth>["signInWithPassword"];
   signOut: () => Promise<void>;
   /** Call after progress changes locally — pushes to the cloud immediately if signed in. */
   onProgressChange: (ids: string[]) => void;
@@ -97,6 +100,9 @@ export function useSync(): UseSyncResult {
     restoredFilesystem,
     signInWithMagicLink: auth.signInWithMagicLink,
     signInWithGitHub: auth.signInWithGitHub,
+    signInWithGoogle: auth.signInWithGoogle,
+    signUpWithPassword: auth.signUpWithPassword,
+    signInWithPassword: auth.signInWithPassword,
     signOut,
     onProgressChange,
     onFilesystemChange,

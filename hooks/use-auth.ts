@@ -18,6 +18,18 @@ function friendlyAuthError(message: string): string {
   if (lower.includes("expired") || (lower.includes("link") && lower.includes("invalid"))) {
     return "That sign-in link has expired or was already used — request a new one.";
   }
+  if (lower.includes("invalid login credentials")) {
+    return "Wrong email or password.";
+  }
+  if (lower.includes("user already registered") || (lower.includes("already") && lower.includes("registered"))) {
+    return "An account with that email already exists — try signing in instead.";
+  }
+  if (lower.includes("password") && (lower.includes("least") || lower.includes("short") || lower.includes("weak"))) {
+    return "Password needs to be at least 6 characters.";
+  }
+  if (lower.includes("email not confirmed")) {
+    return "Check your inbox to confirm your email before signing in.";
+  }
   if (lower.includes("invalid") && lower.includes("email") && !lower.includes("link")) {
     return "That doesn't look like a valid email address.";
   }
@@ -32,6 +44,9 @@ interface UseAuthResult {
   isAvailable: boolean;
   signInWithMagicLink: (email: string) => Promise<{ error: string | null }>;
   signInWithGitHub: () => Promise<{ error: string | null }>;
+  signInWithGoogle: () => Promise<{ error: string | null }>;
+  signUpWithPassword: (email: string, password: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
+  signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -79,6 +94,40 @@ export function useAuth(): UseAuthResult {
     return { error: error ? friendlyAuthError(error.message) : null };
   }, [supabase]);
 
+  const signInWithGoogle = React.useCallback(async () => {
+    if (!supabase) return { error: "Sync isn't configured for this deployment." };
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: typeof window !== "undefined" ? window.location.origin : undefined },
+    });
+    return { error: error ? friendlyAuthError(error.message) : null };
+  }, [supabase]);
+
+  const signUpWithPassword = React.useCallback(
+    async (email: string, password: string) => {
+      if (!supabase) return { error: "Sync isn't configured for this deployment.", needsConfirmation: false };
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined },
+      });
+      if (error) return { error: friendlyAuthError(error.message), needsConfirmation: false };
+      // Supabase returns a user with no session when email confirmation is required.
+      const needsConfirmation = !!data.user && !data.session;
+      return { error: null, needsConfirmation };
+    },
+    [supabase]
+  );
+
+  const signInWithPassword = React.useCallback(
+    async (email: string, password: string) => {
+      if (!supabase) return { error: "Sync isn't configured for this deployment." };
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error ? friendlyAuthError(error.message) : null };
+    },
+    [supabase]
+  );
+
   const signOut = React.useCallback(async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
@@ -90,6 +139,9 @@ export function useAuth(): UseAuthResult {
     isAvailable: !!supabase,
     signInWithMagicLink,
     signInWithGitHub,
+    signInWithGoogle,
+    signUpWithPassword,
+    signInWithPassword,
     signOut,
   };
 }
