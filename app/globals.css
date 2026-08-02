@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  --background: #fafafa;
+  --surface: #ffffff;
+  --surface-raised: #f0f0f0;
+  --foreground: #161616;
+  --muted: #6b6b6b;
+  --border: #e2e2e2;
+  --accent: #0891a8;
+  --accent-glow: #22d3ee;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --surface: #131313;
+  --surface-raised: #1c1c1c;
+  --foreground: #e8e8e8;
+  --muted: #8a8a8a;
+  --border: #2a2a2a;
+  --accent: #22d3ee;
+  --accent-glow: #22d3ee;
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: #0a0a0a;
+}
+
+/* thin, quiet scrollbars for the terminal panes */
+.term-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.term-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.term-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+@keyframes blink-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.cursor-blink {
+  animation: blink-caret 1s step-end infinite;
+}
+
+@keyframes loading-sweep {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(150%); }
+  100% { transform: translateX(150%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-blink {
+    animation: none;
+    opacity: 1;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
